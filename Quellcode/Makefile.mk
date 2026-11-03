@@ -305,12 +305,11 @@ AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
 
 
-#---------------- MyAVR MK3 Commands ----------------
-# Set datamode for MK3
-MK3_SET_DATAMODE = "@main mode d"
-# Set ISP mode for MK3 and emulate as AVR910
-# Use '@main mode s' for STK500
-MK3_SET_ISPMODE = "@main mode a"
+#---------------- mySmartUSB MK2 Commands ----------------
+# Set datamode for MK2
+MK2_SET_DATAMODE = "\346\265\272\271\262\263\251d"
+# Set ISP mode for MK2 and emulate as AVR911
+MK2_SET_ISPMODE = "\346\265\272\271\262\263\251p"
 
 
 
@@ -463,25 +462,25 @@ find-serial-port:
 	echo "Serieller Port gefunden: $$PORT"
 
 
-mk3-set-datamode: find-serial-port
-	@$(MK3_COMMAND_COMMS) $(AVRDUDE_PORT) MK3_SET_DATAMODE
+mk2-set-datamode: find-serial-port
+	@$(MK2_COMMAND_COMMS) $(AVRDUDE_PORT) $(MK2_SET_DATAMODE)
 
 
-mk3-set-programmingmode: find-serial-port
-	@$(MK3_COMMAND_COMMS) $(AVRDUDE_PORT) MK3_SET_ISPMODE
+mk2-set-programmingmode: find-serial-port
+	@$(MK2_COMMAND_COMMS) $(AVRDUDE_PORT) $(MK2_SET_ISPMODE)
 
 
-program: mk3-set-programmingmode $(TARGET).hex $(TARGET).eep
+program: $(TARGET).hex $(TARGET).eep mk2-set-programmingmode
 	@echo "Flashing AVR ..."
 	$(AVRDUDE) -P $(AVRDUDE_PORT) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
 
-fuses: mk3-set-programmingmode
+fuses: mk2-set-programmingmode
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMER) -p $(MCU) -P $(AVRDUDE_PORT) $(AVRDUDE_BURN_FUSES)
 
 
-datamode: mk3-set-datamode
-	@echo "Wechsel zu Datenmodus des MyAVR Mk3"
+datamode: mk2-set-datamode
+	@echo "Wechsel zu Datenmodus des mySmartUSB MK2"
 
 
 # Generate avr-gdb config/init file which does the following:
